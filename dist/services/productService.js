@@ -31,14 +31,14 @@ class ProductService {
     getAllProducts() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield productModel_1.product.find(); // Fetch all products from the database
+                // Await the find operation to fetch all products from the database
+                return yield productModel_1.product.find();
             }
             catch (error) {
                 if (error instanceof Error) {
                     throw new Error(`Failed to fetch products: ${error.message}`);
                 }
-                throw new Error('Failed to fetch product: An unknown error occurred');
-                ;
+                throw new Error('Failed to fetch products: An unknown error occurred');
             }
         });
     }
@@ -57,18 +57,18 @@ class ProductService {
             }
         });
     }
-    //update a product by Id
+    // Update a product by Id
     updateProduct(id, data) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield productModel_1.product.findOneAndUpdate(id);
+                // Ensure you pass the update data as the second argument
+                return yield productModel_1.product.findOneAndUpdate({ _id: id }, { $set: data }, { new: true });
             }
             catch (error) {
                 if (error instanceof Error) {
                     throw new Error(`Failed to update product: ${error.message}`);
                 }
                 throw new Error('Failed to update product: An unknown error occurred');
-                ;
             }
         });
     }

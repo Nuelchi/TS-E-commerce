@@ -29,12 +29,17 @@ class productController {
             }
         });
     }
-    //get product 
     getAllProducts(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const products = productService.getAllProducts();
-                res.status(200).json({ message: "product fetched successfully", data: products });
+                const products = yield productService.getAllProducts();
+                // If no products are found, return a message
+                if (!products || products.length === 0) {
+                    res.status(404).json({ message: "No products found" });
+                    return;
+                }
+                // Send the products in the response if they exist
+                res.status(200).json({ message: "Products fetched successfully", products });
             }
             catch (error) {
                 res.status(500).json({ message: error.message });
@@ -63,7 +68,8 @@ class productController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const productId = new mongoose_1.default.Types.ObjectId(req.params.id);
-                const updatedProduct = yield productService.updateProduct(productId, req.body);
+                const updateProduct = req.body;
+                const updatedProduct = yield productService.updateProduct(productId, updateProduct);
                 if (!updatedProduct) {
                     res.status(404).json({ message: "Product not found" });
                     return;
