@@ -1,15 +1,17 @@
 import express from 'express';
 import { UserController } from '../Controllers/userController';
-// import { authenticate } from '../middlewares/auth.middleware'; // For protected routes (optional)
+import { Protection } from "../Authorization/authentication";
 
 const router = express.Router();
+
+// Declaration of instance
+const protect = new Protection
 const userController = new UserController();
 
 //ROUTES
 router.post('/signup',userController.signup);
 router.post('/login', userController.login);
-router.get('/users', userController.getAllUsers);
-// router.patch('/update-password', authenticate, (req, res) => userController.updatePassword(req, res));
-// router.get('/users', authenticate, (req, res) => userController.getAllUsers(req, res));
+router.get('/users',protect.protectPath,protect.restriction('admin'),userController.getAllUsers);
+
 
 export default router;

@@ -1,11 +1,15 @@
 import { Request, Response } from 'express'
 import dotenv from 'dotenv';
 dotenv.config();
-import './Authorization/authService'
-import session from 'express-session';
-import productRoute from './Routes/productRoutes'
+import cors from "cors";
+import './services/googleAuthService'
 import passport from 'passport';
-// import mongoose from 'mongoose';
+import session from 'express-session';
+
+//ROUTE IMPORTS
+import productRoute from './Routes/productRoutes';
+import paymentRoute from './Routes/payment-route';
+import userRoute from './Routes/user-route';
 
 const express = require ('express')
 const mongoose = require ('mongoose')
@@ -27,24 +31,27 @@ app.get('/', (req:Request, res:Response) => {
     res.send('<a href="/auth/google">Login with Google</a>');
   });
 
+  
 //Middlewares
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
+app.use(cors());
 app.use(session ({
     secret: 'my-session-secret',
     resave: false,
     saveUninitialized: true,
 }));
-
 //initialize passport and session
 app.use(passport.initialize());
 app.use(passport.session());
 
+
 //ROUTES
 app.use("/api/v1/product", productRoute);
+app.use("/api/payments",paymentRoute);
+app.use("/api/user",userRoute);
 // Route to start Google login
 app.get('/auth/google', passport.authenticate('google', {scope: ['profile', 'email']}));
-// Callback route for Google to redirect to
 app.get('/auth/google/callback',
     passport.authenticate('google', {
       failureRedirect: '/',
@@ -74,3 +81,4 @@ mongoose.connect(process.env.MONGO_URL)
 //PORT
 app.listen(PORT, ()=>
     console.log(`server is successfully connected at http://localhost:${PORT}`));
+

@@ -22,24 +22,28 @@ passport_1.default.use(new passport_google_oauth20_1.Strategy({
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     callbackURL: "http://localhost:3000/auth/google/callback",
 }, (accessToken, refreshToken, profile, done) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
+    var _a, _b;
     try {
-        //find or create the user in the database
+        // Find the user by Google ID
         let user = yield user_model_1.userModel.findOne({ googleId: profile.id });
         if (!user) {
-            let user = yield user_model_1.userModel.create({
-                name: profile.displayName,
-                email: ((_a = profile.emails) === null || _a === void 0 ? void 0 : _a[0].value) || "",
-                password: "password",
-                confirmPassword: "password",
-                role: "user",
-            });
+            // If user does not exist, check if email already exists in the database
+            user = yield user_model_1.userModel.findOne({ email: (_a = profile.emails) === null || _a === void 0 ? void 0 : _a[0].value });
+            if (!user) {
+                user = yield user_model_1.userModel.create({
+                    googleId: profile.id, // Save the googleId
+                    name: profile.displayName,
+                    email: ((_b = profile.emails) === null || _b === void 0 ? void 0 : _b[0].value) || "",
+                    password: "password",
+                    confirmPassword: "password",
+                    role: "user",
+                });
+            }
         }
-        ;
-        return done(null, profile);
+        return done(null, user); // Pass the user object to done
     }
     catch (error) {
-        return done(error);
+        return done(error); // Pass the error to done
     }
 })));
 // Serialize user to store user info in session

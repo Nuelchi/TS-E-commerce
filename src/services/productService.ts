@@ -1,4 +1,4 @@
-import { product } from "../Models/productModel";
+import product  from "../Models/productModel";
 import { myProduct } from "../Interface/productInterface";
 import mongoose from "mongoose";
 

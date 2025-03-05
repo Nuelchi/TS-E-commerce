@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
+const cors_1 = __importDefault(require("cors"));
 require("./Authorization/authService");
 const express_session_1 = __importDefault(require("express-session"));
 const productRoutes_1 = __importDefault(require("./Routes/productRoutes"));
@@ -23,6 +24,7 @@ app.get('/', (req, res) => {
 //Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use((0, cors_1.default)());
 app.use((0, express_session_1.default)({
     secret: 'my-session-secret',
     resave: false,
@@ -44,7 +46,13 @@ app.get('/auth/google/callback', passport_1.default.authenticate('google', {
 //profile route
 app.get('/profile', (req, res) => {
     const user = req.user;
-    res.send(`welcome ${user.name}`);
+    res.send(`welcome ${user.name} you have successfully signed into E-commerce app, you may continue your shopping now!!`);
+});
+//logout route
+app.get("/logout", (req, res) => {
+    req.logout(() => {
+        res.redirect("/");
+    });
 });
 //Mongo database
 mongoose.connect(process.env.MONGO_URL)
