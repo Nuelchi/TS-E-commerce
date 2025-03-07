@@ -76,7 +76,7 @@ app.get("/logout", (req: Request, res: Response) => {
 //Mongo database
 mongoose.connect(process.env.MONGO_URL)
     .then(() => console.log('connected to the Database!!'))
-    .catch ((error: Error) => console.log('connection failedt', error));
+    .catch ((error: Error) => console.log('connection failed', error));
 
 //PORT
 app.listen(PORT, ()=>

@@ -1,7 +1,7 @@
 
 import {Protection} from "../Authorization/authentication"
 import { Router} from "express";
-import { InitializePayment } from "../Controllers/payment-controller";
+import { InitializePayment } from "../Controllers/paystack-controller";
 
 //create a new instance
 const Protect = new Protection();

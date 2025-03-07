@@ -24,7 +24,7 @@ export class userService {
     //       throw new Error('Invalid credentials');
     //     }
 
-    //     // ✅ Correctly referencing environment variables
+    //     // Correctly referencing environment variables
     //     const secret = process.env.SECRET_STRING as string;
     //     const expiry = process.env.LOGIN_EXPIRY || '1h'; // Default to 1 hour if undefined
 
