@@ -8,15 +8,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProductService = void 0;
-const productModel_1 = require("../Models/productModel");
+const productModel_1 = __importDefault(require("../Models/productModel"));
 class ProductService {
     // Create a new product
     createProduct(data) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const newProduct = new productModel_1.product(data);
+                const newProduct = new productModel_1.default(data);
                 return yield newProduct.save(); // Save the new product to the database
             }
             catch (error) { // Type error as `unknown`
@@ -32,7 +35,7 @@ class ProductService {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 // Await the find operation to fetch all products from the database
-                return yield productModel_1.product.find();
+                return yield productModel_1.default.find();
             }
             catch (error) {
                 if (error instanceof Error) {
@@ -46,7 +49,7 @@ class ProductService {
     getProductById(id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return productModel_1.product.findById(id);
+                return productModel_1.default.findById(id);
             }
             catch (error) {
                 if (error instanceof Error) {
@@ -62,7 +65,7 @@ class ProductService {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 // Ensure you pass the update data as the second argument
-                return yield productModel_1.product.findOneAndUpdate({ _id: id }, { $set: data }, { new: true });
+                return yield productModel_1.default.findOneAndUpdate({ _id: id }, { $set: data }, { new: true });
             }
             catch (error) {
                 if (error instanceof Error) {
@@ -76,7 +79,7 @@ class ProductService {
     deleteProduct(id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield productModel_1.product.findByIdAndDelete(id);
+                return yield productModel_1.default.findByIdAndDelete(id);
             }
             catch (error) {
                 if (error instanceof Error) {

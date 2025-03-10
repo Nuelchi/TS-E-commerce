@@ -19,7 +19,7 @@ dotenv_1.default.config(); // Load environment variables
 const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
 const FRONTEND_URL = process.env.FRONTEND_URL;
 exports.paystackService = {
-    // ✅ Initialize Payment
+    // Initialize Payment
     initializePayment(email, amount) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
@@ -40,7 +40,7 @@ exports.paystackService = {
             }
         });
     },
-    // ✅ Verify Payment
+    // Verify Payment
     verifyPayment(reference) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;

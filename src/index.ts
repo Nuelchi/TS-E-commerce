@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import dotenv from 'dotenv';
 dotenv.config();
 import cors from "cors";
-import './services/googleAuthService'
+import './services/authService'
 import passport from 'passport';
 import session from 'express-session';
 

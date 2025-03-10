@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.product = void 0;
 const mongoose_1 = require("mongoose");
 const productSchema = new mongoose_1.Schema({
     name: { type: String, required: true },
@@ -12,4 +11,4 @@ const productSchema = new mongoose_1.Schema({
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now }
 }, { timestamps: true });
-exports.product = (0, mongoose_1.model)("product", productSchema);
+exports.default = (0, mongoose_1.model)("product", productSchema);

@@ -14,7 +14,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Protection = void 0;
 const user_model_1 = require("../Models/user-model");
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken")); // Fix the import
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
 class Protection {
     constructor() {
         // Middleware to protect routes
@@ -23,17 +25,18 @@ class Protection {
                 const authorizationHeader = req.headers.authorization;
                 if (!authorizationHeader || !authorizationHeader.toLowerCase().startsWith("bearer")) {
                     res.status(401).json({ message: "Authorization header missing or invalid" });
-                    return; // ✅ Ensure function exits
+                    return;
                 }
                 const token = authorizationHeader.split(" ")[1]; // Extract the token
                 const decoded = jsonwebtoken_1.default.verify(token, process.env.SECRET_STRING); // Verify token
                 const user = yield user_model_1.userModel.findById(decoded.id);
                 if (!user) {
                     res.status(400).json({ message: "User with token not found in DB. Please sign up or log in." });
-                    return; // ✅ Ensure function exits
+                    return;
                 }
                 req.user = user; // Attach user object to request
-                next(); // ✅ Call next() properly
+                req.user.id =
+                    next();
             }
             catch (error) {
                 console.error("Token verification failed:", error.message);
@@ -45,13 +48,13 @@ class Protection {
             return (req, res, next) => {
                 if (!req.user) {
                     res.status(401).json({ message: "User not authenticated" });
-                    return; // ✅ Ensure function exits
+                    return;
                 }
                 if (!roles.includes(req.user.role)) {
                     res.status(403).json({ message: "You do not have access to perform this action" });
-                    return; // ✅ Ensure function exits
+                    return;
                 }
-                next(); // ✅ Allow request to continue
+                next();
             };
         };
     }

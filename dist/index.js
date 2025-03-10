@@ -6,11 +6,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const cors_1 = __importDefault(require("cors"));
-require("./Authorization/authService");
-const express_session_1 = __importDefault(require("express-session"));
-const productRoutes_1 = __importDefault(require("./Routes/productRoutes"));
+require("./services/authService");
 const passport_1 = __importDefault(require("passport"));
-// import mongoose from 'mongoose';
+const express_session_1 = __importDefault(require("express-session"));
+//ROUTE IMPORTS
+const productRoutes_1 = __importDefault(require("./Routes/productRoutes"));
+const payment_route_1 = __importDefault(require("./Routes/payment-route"));
+const user_route_1 = __importDefault(require("./Routes/user-route"));
 const express = require('express');
 const mongoose = require('mongoose');
 const app = express();
@@ -35,9 +37,10 @@ app.use(passport_1.default.initialize());
 app.use(passport_1.default.session());
 //ROUTES
 app.use("/api/v1/product", productRoutes_1.default);
+app.use("/api/payments", payment_route_1.default);
+app.use("/api/user", user_route_1.default);
 // Route to start Google login
 app.get('/auth/google', passport_1.default.authenticate('google', { scope: ['profile', 'email'] }));
-// Callback route for Google to redirect to
 app.get('/auth/google/callback', passport_1.default.authenticate('google', {
     failureRedirect: '/',
 }), (req, res) => {
@@ -57,6 +60,6 @@ app.get("/logout", (req, res) => {
 //Mongo database
 mongoose.connect(process.env.MONGO_URL)
     .then(() => console.log('connected to the Database!!'))
-    .catch((error) => console.log('connection failedt', error));
+    .catch((error) => console.log('connection failed', error));
 //PORT
 app.listen(PORT, () => console.log(`server is successfully connected at http://localhost:${PORT}`));

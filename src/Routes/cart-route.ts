@@ -12,7 +12,7 @@ const cart = new cartController();
 
 const router = Router();
 
-// ✅ Add item to cart
+// Add item to cart
 router.post("/add", Protect.protectPath ,cart.addToCart);
 router.get("/getcart", Protect.protectPath, cart.getCart);
 router.delete("/:id", Protect.protectPath, cart.removeFromCart);

@@ -1,122 +1,141 @@
 import { Request, Response } from "express";
 import Cart from "../Models/cart-model";
 import Product from "../Models/productModel";
-import dotenv from 'dotenv'
-dotenv.config();
-
-interface AuthenticatedRequest extends Request {
-    user: { id: string; name?: string };
-}
 
 export class cartController {
-  // Add product to cart
-  async addToCart(req: AuthenticatedRequest, res: Response): Promise<Response> {
-    try {
-      if (!req.user) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
+    
+    // Add product to cart
+    addToCart = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const user = (req as any).user;
+            if (!user) {
+                res.status(401).json({ message: "Unauthorized. User not found." });
+                return;
+            }
 
-      const { productId, quantity } = req.body;
-      if (!productId || !quantity) {
-        return res.status(400).json({ message: "Product ID and quantity are required" });
-      }
+            const { productId, quantity } = req.body;
+            if (!productId || !quantity) {
+                res.status(400).json({ message: "Product ID and quantity are required" });
+                return;
+            }
 
-      const product = await Product.findById(productId);
-      if (!product) {
-        return res.status(404).json({ message: "Product not found" });
-      }
+            const product = await Product.findById(productId);
+            if (!product) {
+                res.status(404).json({ message: "Product not found" });
+                return;
+            }
 
-      let cart = await Cart.findOne({ userId: req.user.id });
-      if (!cart) {
-        cart = new Cart({ userId: req.user.id, products: [], totalPrice: 0 });
-      }
+            let cart = await Cart.findOne({ userId: user.id });
+            if (!cart) {
+                cart = new Cart({ userId: user.id, products: [], totalPrice: 0 });
+            }
 
-      const existingProduct = cart.products.find((item) => item.productId.equals(productId));
-      if (existingProduct) {
-        existingProduct.quantity += quantity;
-      } else {
-        cart.products.push({ productId, quantity });
-      }
+            const existingProduct = cart.products.find(item => item.productId.toString() === productId);
+            if (existingProduct) {
+                existingProduct.quantity += quantity;
+            } else {
+                cart.products.push({ productId, quantity });
+            }
 
-      cart.totalPrice = await this.calculateTotalPrice(cart.products);
-      await cart.save();
+            cart.totalPrice = await this.calculateTotalPrice(cart.products);
+            await cart.save();
 
-      return res.status(200).json({ message: "Product added to cart", cart });
-    } catch (error: any) {
-      return res.status(500).json({ message: error.message });
-    }
-  };
+            res.status(200).json({ message: "Product added to cart", cart });
+        } catch (error: any) {
+            res.status(500).json({ message: error.message });
+        }
+    };
 
-  // Get user's cart
-  async getCart(req: AuthenticatedRequest, res: Response): Promise<Response> {
-    try {
-      if (!req.user) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
+    // Get user's cart
+    getCart = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const user = (req as any).user;
+            if (!user) {
+                res.status(401).json({ message: "Unauthorized. User not found." });
+                return;
+            }
 
-      const cart = await Cart.findOne({ userId: req.user.id }).populate("products.productId");
-      if (!cart) {
-        return res.status(404).json({ message: "Cart is empty" });
-      }
+            const cart = await Cart.findOne({ userId: user.id }).populate("products.productId");
+            if (!cart) {
+                res.status(404).json({ message: "Cart is empty" });
+                return;
+            }
 
-      return res.status(200).json(cart);
-    } catch (error: any) {
-      return res.status(500).json({ message: error.message });
-    }
-  };
+            res.status(200).json(cart);
+        } catch (error: any) {
+            res.status(500).json({ message: error.message });
+        }
+    };
 
-  // Remove product from cart
-  async removeFromCart(req: AuthenticatedRequest, res: Response): Promise<Response> {
-    try {
-      if (!req.user) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
+    // Remove product from cart
+    removeFromCart = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const user = (req as any).user;
+            if (!user) {
+                res.status(401).json({ message: "Unauthorized. User not found." });
+                return;
+            }
 
-      const { productId } = req.params;
-      let cart = await Cart.findOne({ userId: req.user.id });
+            const { productId } = req.params;
+            let cart = await Cart.findOne({ userId: user.id });
 
-      if (!cart) {
-        return res.status(404).json({ message: "Cart not found" });
-      }
+            if (!cart) {
+                res.status(404).json({ message: "Cart not found" });
+                return;
+            }
 
-      cart.products.pull({ productId })
-      cart.totalPrice = await this.calculateTotalPrice(cart.products);
+            if (!cart.products || cart.products.length === 0) {
+                res.status(400).json({ message: "Cart is empty" });
+                return;
+            }
 
-      await cart.save();
-      return res.status(200).json({ message: "Product removed from cart", cart });
-    } catch (error: any) {
-      return res.status(500).json({ message: error.message });
-    }
-  };
+            const initialLength = cart.products.length;
+            cart.products.pull({ productId });
 
-  // Delete entire cart
-  async deleteCart(req: AuthenticatedRequest, res: Response): Promise<Response> {
-    try {
-      if (!req.user) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
+            if (cart.products.length === initialLength) {
+                res.status(404).json({ message: "Product not found in cart" });
+                return;
+            }
 
-      const cart = await Cart.findOne({ userId: req.user.id });
-      if (!cart) {
-        return res.status(404).json({ message: "Cart not found" });
-      }
+            cart.totalPrice = await this.calculateTotalPrice(cart.products);
+            await cart.save();
 
-      await Cart.deleteOne({ userId: req.user.id });
-      return res.status(200).json({ message: "Cart deleted successfully" });
-    } catch (error: any) {
-      return res.status(500).json({ message: error.message });
-    }
-  }
+            res.status(200).json({ message: "Product removed from cart", cart });
+        } catch (error: any) {
+            res.status(500).json({ message: error.message });
+        }
+    };
 
-  // Calculate total price helper function
-  private async calculateTotalPrice(products: any[]): Promise<number> {
-    let total = 0;
-    for (const item of products) {
-      const product = await Product.findById(item.productId);
-      if (product) {
-        total += product.price * item.quantity;
-      }
-    }
-    return total;
-  }
+    // Delete entire cart
+    deleteCart = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const user = (req as any).user;
+            if (!user) {
+                res.status(401).json({ message: "Unauthorized. User not found." });
+                return;
+            }
+
+            const cart = await Cart.findOne({ userId: user.id });
+            if (!cart) {
+                res.status(404).json({ message: "Cart not found" });
+                return;
+            }
+
+            await Cart.deleteOne({ userId: user.id });
+            res.status(200).json({ message: "Cart deleted successfully" });
+        } catch (error: any) {
+            res.status(500).json({ message: error.message });
+        }
+    };
+
+    // Helper function to calculate total price
+    private calculateTotalPrice = async (products: any[]): Promise<number> => {
+        const productPrices = await Promise.all(
+            products.map(async item => {
+                const product = await Product.findById(item.productId);
+                return product ? product.price * item.quantity : 0;
+            })
+        );
+        return productPrices.reduce((acc, curr) => acc + curr, 0);
+    };
 }
