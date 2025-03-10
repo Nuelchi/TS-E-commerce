@@ -1,34 +1,14 @@
-// models/cart-model.ts
-import mongoose, { Document } from "mongoose";
+import { Document, Types } from "mongoose";
 
-interface CartProduct {
-  productId: mongoose.Types.ObjectId;
+export interface ICartProduct {
+  productId: Types.ObjectId;
   quantity: number;
 }
 
 export interface ICart extends Document {
-  userId: mongoose.Types.ObjectId;
-  products: CartProduct[];
+  userId: Types.ObjectId;
+  products: ICartProduct[];
   totalPrice: number;
-}
-
-const CartSchema = new mongoose.Schema<ICart>({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-  products: [
-    {
-      productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true },
-      quantity: { type: Number, required: true, default: 1 },
-    },
-  ],
-  totalPrice: { type: Number, required: true, default: 0 },
-});
-
-const Cart = mongoose.model<ICart>("Cart", CartSchema);
-export default Cart;
-
-// interfaces/authenticated-request.ts
-import { Request } from "express";
-
-export interface AuthenticatedRequest extends Request {
-  user?: { id: string; role?: string };
+  createdAt?: Date;
+  updatedAt?: Date;
 }
