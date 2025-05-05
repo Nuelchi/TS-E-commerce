@@ -99,7 +99,6 @@ Server runs on `http://localhost:5000`
 
 ### Authentication
 | Method | Endpoint | Description |
-
 | POST   | `/api/auth/register` | Register a new user |
 | POST   | `/api/auth/login`    | Login user & get token |
 
@@ -113,15 +112,26 @@ Server runs on `http://localhost:5000`
 | DELETE | `/api/products/:id` | Delete product (Admin) |
 
 ### Cart
-| Method | Endpoint | Description |
+| Method | Endpoint           | Description               |
+|--------|--------------------|---------------------------|
+| POST   | `/cart/add`        | Add item to cart          |
+| GET    | `/cart/getcart`    | Get current cart          |
+| DELETE | `/cart/:id`        | Remove an item from cart  |
+| DELETE | `/cart/delete/`    | Delete entire cart        |
 
-| POST   | `/use/signup` | create a new user |
+### Users
+| POST   | `/user/signup` | create a new user |
 | POST   | `/user/login` | login a user |
 | GET    | `/users/`     | Get all users (admin)|
 
+### Payment
+| Method | Endpoint                          | Description           |
+|--------|-----------------------------------|-----------------------|
+| POST   | `/payment/initialize-payment`     | Initialize a payment  |
+| GET    | `/payment/verify-payment/:reference` | Verify a payment   |
+
 
 ## 🚀 Future Improvements
-- ✅ Add Paystack payment integration
 - ✅ Implement unit tests with Jest
 - ✅ Deploy the API to production
 
